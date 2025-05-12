@@ -17,7 +17,7 @@ const chainOptions = [
 ];
 
 interface ConfessionFormProps {
-  onSubmitConfession: (confession: Confession) => void;
+  onSubmitConfession: (confession: Omit<Confession, 'id' | 'timestamp'>) => void;
 }
 
 export interface Confession {
@@ -35,6 +35,7 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
     chain: "eth",
     degenRating: 3
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,27 +49,32 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
       return;
     }
     
-    const newConfession: Confession = {
-      id: crypto.randomUUID(),
+    setIsSubmitting(true);
+    
+    const newConfession = {
       text: formData.text,
       chain: formData.chain,
-      degenRating: formData.degenRating,
-      timestamp: Date.now()
+      degenRating: formData.degenRating
     };
     
-    onSubmitConfession(newConfession);
-    
-    // Reset form
-    setFormData({
-      text: "",
-      chain: "eth",
-      degenRating: 3
-    });
-    
-    toast({
-      title: "Confession submitted!",
-      description: "Your secret is safe on the chain now...",
-    });
+    try {
+      onSubmitConfession(newConfession);
+      
+      // Reset form
+      setFormData({
+        text: "",
+        chain: "eth",
+        degenRating: 3
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit confession. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
@@ -92,6 +98,7 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
             onChange={(e) => setFormData({ ...formData, text: e.target.value })}
             className="w-full h-40 bg-terminal-darkgray text-terminal-green border-2 border-terminal-purple p-3 font-vt323 text-lg focus:outline-none focus:ring-2 focus:ring-terminal-purple"
             placeholder="I panic sold at the bottom and told everyone I diamond handed..."
+            disabled={isSubmitting}
           />
         </div>
         
@@ -102,6 +109,7 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
               value={formData.chain}
               onChange={(e) => setFormData({ ...formData, chain: e.target.value })}
               className="w-full bg-terminal-darkgray text-terminal-green border-2 border-terminal-purple p-2 font-vt323 text-lg focus:outline-none focus:ring-2 focus:ring-terminal-purple"
+              disabled={isSubmitting}
             >
               {chainOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -116,18 +124,20 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
             <DegenRating
               rating={formData.degenRating}
               onChange={(rating) => setFormData({ ...formData, degenRating: rating })}
+              disabled={isSubmitting}
             />
           </div>
         </div>
         
         <div className="flex gap-4">
-          <RetroButton type="submit">
-            Submit Confession
+          <RetroButton type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'SUBMITTING...' : 'Submit Confession'}
           </RetroButton>
           
           <RetroButton 
             onClick={handleReset} 
             className="bg-terminal-darkgray border-terminal-lightpurple shadow-[4px_4px_0px_0px_rgba(126,105,171,1)] hover:shadow-[2px_2px_0px_0px_rgba(126,105,171,1)]"
+            disabled={isSubmitting}
           >
             Confess Again
           </RetroButton>

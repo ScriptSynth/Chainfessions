@@ -5,6 +5,8 @@ import PixelContainer from './PixelContainer';
 import RetroText from './RetroText';
 import RetroButton from './RetroButton';
 import ConfessionCard from './ConfessionCard';
+import { getRandomConfession } from '@/services/confessionService';
+import { useToast } from "@/hooks/use-toast";
 
 interface RandomConfessionViewerProps {
   confessions: Confession[];
@@ -13,28 +15,38 @@ interface RandomConfessionViewerProps {
 const RandomConfessionViewer = ({ confessions }: RandomConfessionViewerProps) => {
   const [randomConfession, setRandomConfession] = useState<Confession | null>(null);
   const [glitchEffect, setGlitchEffect] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const getRandomConfession = () => {
-    if (confessions.length === 0) return null;
-    
-    // Apply glitch animation
+  const fetchRandomConfession = async () => {
+    setIsLoading(true);
     setGlitchEffect(true);
     setTimeout(() => setGlitchEffect(false), 500);
     
-    // Get random confession
-    const randomIndex = Math.floor(Math.random() * confessions.length);
-    return confessions[randomIndex];
+    try {
+      const confession = await getRandomConfession();
+      setRandomConfession(confession);
+    } catch (error) {
+      console.error('Error fetching random confession:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch a random confession. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGetRandom = () => {
-    setRandomConfession(getRandomConfession());
+    fetchRandomConfession();
   };
 
   useEffect(() => {
     if (confessions.length > 0 && !randomConfession) {
-      setRandomConfession(getRandomConfession());
+      fetchRandomConfession();
     }
-  }, [confessions]);
+  }, [confessions.length]);
 
   if (confessions.length === 0) {
     return (
@@ -48,12 +60,22 @@ const RandomConfessionViewer = ({ confessions }: RandomConfessionViewerProps) =>
 
   return (
     <div className="space-y-4">
-      <div className={`transition-all ${glitchEffect ? 'animate-glitch' : ''}`}>
-        {randomConfession && <ConfessionCard confession={randomConfession} isRandom />}
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center py-12">
+          <div className="terminal-loading">
+            <RetroText glowing className="text-xl text-terminal-green animate-pulse">
+              SCANNING THE BLOCKCHAIN...
+            </RetroText>
+          </div>
+        </div>
+      ) : (
+        <div className={`transition-all ${glitchEffect ? 'animate-glitch' : ''}`}>
+          {randomConfession && <ConfessionCard confession={randomConfession} isRandom />}
+        </div>
+      )}
       
       <div className="flex justify-center">
-        <RetroButton onClick={handleGetRandom}>
+        <RetroButton onClick={handleGetRandom} disabled={isLoading}>
           New Random Confession
         </RetroButton>
       </div>
