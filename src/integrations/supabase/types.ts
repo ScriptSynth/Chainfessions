@@ -33,6 +33,64 @@ export type Database = {
         }
         Relationships: []
       }
+      reactions: {
+        Row: {
+          confession_id: string
+          created_at: string
+          id: string
+          reaction_type: string
+        }
+        Insert: {
+          confession_id: string
+          created_at?: string
+          id?: string
+          reaction_type: string
+        }
+        Update: {
+          confession_id?: string
+          created_at?: string
+          id?: string
+          reaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reactions_confession_id_fkey"
+            columns: ["confession_id"]
+            isOneToOne: false
+            referencedRelation: "confessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      replies: {
+        Row: {
+          confession_id: string
+          created_at: string
+          id: string
+          text: string
+        }
+        Insert: {
+          confession_id: string
+          created_at?: string
+          id?: string
+          text: string
+        }
+        Update: {
+          confession_id?: string
+          created_at?: string
+          id?: string
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replies_confession_id_fkey"
+            columns: ["confession_id"]
+            isOneToOne: false
+            referencedRelation: "confessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

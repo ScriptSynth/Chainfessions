@@ -1,9 +1,13 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Confession } from './ConfessionForm';
 import PixelContainer from './PixelContainer';
 import RetroText from './RetroText';
 import DegenRating from './DegenRating';
+import ReactionButton from './ReactionButton';
+import ReplyForm from './ReplyForm';
+import { addReaction, getReactions, getReplies, ReactionType, Reaction, Reply } from '@/services/confessionService';
+import { useToast } from "@/hooks/use-toast";
 
 interface ConfessionCardProps {
   confession: Confession;
@@ -53,6 +57,79 @@ const formatDate = (timestamp: number) => {
 };
 
 const ConfessionCard = ({ confession, isRandom = false }: ConfessionCardProps) => {
+  const [reactions, setReactions] = useState<Reaction[]>([]);
+  const [replies, setReplies] = useState<Reply[]>([]);
+  const [showReplies, setShowReplies] = useState(false);
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [isLoadingReactions, setIsLoadingReactions] = useState(false);
+  const [isLoadingReplies, setIsLoadingReplies] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!isRandom) {
+      loadReactions();
+    }
+  }, [confession.id, isRandom]);
+
+  const loadReactions = async () => {
+    setIsLoadingReactions(true);
+    try {
+      const data = await getReactions(confession.id);
+      setReactions(data);
+    } catch (error) {
+      console.error('Error loading reactions:', error);
+    } finally {
+      setIsLoadingReactions(false);
+    }
+  };
+
+  const loadReplies = async () => {
+    if (replies.length > 0) return;
+    
+    setIsLoadingReplies(true);
+    try {
+      const data = await getReplies(confession.id);
+      setReplies(data);
+    } catch (error) {
+      console.error('Error loading replies:', error);
+    } finally {
+      setIsLoadingReplies(false);
+    }
+  };
+
+  const handleReaction = async (type: ReactionType) => {
+    try {
+      const reaction = await addReaction(confession.id, type);
+      if (reaction) {
+        setReactions(prev => [...prev, reaction]);
+        toast({
+          title: "Reaction added",
+          description: "Your reaction has been added!",
+        });
+      }
+    } catch (error) {
+      console.error('Error adding reaction:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add your reaction. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleShowReplies = () => {
+    setShowReplies(true);
+    loadReplies();
+  };
+
+  const getReactionCount = (type: ReactionType) => {
+    return reactions.filter(r => r.reactionType === type).length;
+  };
+
+  const handleReplyAdded = async () => {
+    await loadReplies();
+  };
+
   return (
     <PixelContainer 
       className={`w-full mb-4 transition-all ${isRandom ? 'animate-glitch' : 'hover:scale-[1.01]'}`}
@@ -71,6 +148,79 @@ const ConfessionCard = ({ confession, isRandom = false }: ConfessionCardProps) =
       <RetroText className={`my-4 text-xl ${isRandom ? 'typewriter-text' : ''}`}>
         {confession.text}
       </RetroText>
+      
+      {!isRandom && (
+        <div className="mt-6 border-t border-terminal-purple/20 pt-3">
+          <div className="flex flex-wrap gap-2">
+            <ReactionButton 
+              type="laugh" 
+              count={getReactionCount('laugh')} 
+              onClick={() => handleReaction('laugh')} 
+            />
+            <ReactionButton 
+              type="fire" 
+              count={getReactionCount('fire')} 
+              onClick={() => handleReaction('fire')} 
+            />
+            <ReactionButton 
+              type="skull" 
+              count={getReactionCount('skull')} 
+              onClick={() => handleReaction('skull')} 
+            />
+            <ReactionButton 
+              type="flag" 
+              count={getReactionCount('flag')} 
+              onClick={() => handleReaction('flag')} 
+            />
+            <ReactionButton 
+              type="reply" 
+              count={replies.length} 
+              onClick={() => {
+                if (!showReplies) {
+                  handleShowReplies();
+                }
+                setShowReplyForm(!showReplyForm);
+              }}
+              active={showReplyForm}
+            />
+          </div>
+        </div>
+      )}
+      
+      {showReplies && (
+        <div className="mt-4 border-t border-terminal-purple/20 pt-3">
+          <RetroText className="text-terminal-purple mb-2">Hot Takes</RetroText>
+          
+          {isLoadingReplies ? (
+            <div className="py-4 text-center">
+              <RetroText className="text-terminal-green animate-pulse">Loading replies...</RetroText>
+            </div>
+          ) : replies.length === 0 ? (
+            <RetroText className="text-terminal-purple/50 text-sm">No replies yet. Be the first!</RetroText>
+          ) : (
+            <div className="space-y-3">
+              {replies.map(reply => (
+                <div key={reply.id} className="px-3 py-2 bg-terminal-purple/5 rounded border-l-2 border-terminal-purple">
+                  <RetroText className="text-terminal-green">
+                    {reply.text}
+                  </RetroText>
+                  <div className="text-right mt-1">
+                    <RetroText className="text-terminal-purple/40 text-xs">
+                      {new Date(reply.createdAt).toLocaleTimeString()}
+                    </RetroText>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      
+      {showReplyForm && (
+        <div className="mt-3 animate-fade-in">
+          <ReplyForm confessionId={confession.id} onReplyAdded={handleReplyAdded} />
+        </div>
+      )}
       
       <div className="text-right mt-4">
         <RetroText className="text-terminal-purple/60 text-sm">
