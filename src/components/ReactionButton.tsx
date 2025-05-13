@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { cn } from "@/lib/utils";
-import { Laugh, Fire, Skull, Flag, MessageSquare } from "lucide-react";
+import { Laugh, Flame, Skull, Flag, MessageSquare } from "lucide-react";
 import { ReactionType } from '@/services/confessionService';
 
 interface ReactionButtonProps {
@@ -24,7 +24,7 @@ const ReactionButton = ({
       case 'laugh':
         return <Laugh size={18} />;
       case 'fire':
-        return <Fire size={18} />;
+        return <Flame size={18} />; // Changed Fire to Flame which is available in lucide-react
       case 'skull':
         return <Skull size={18} />;
       case 'flag':
