@@ -1,44 +1,30 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-terminal-black text-terminal-green font-vt323;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+@layer components {
+  .terminal-window {
+    @apply border-2 border-terminal-purple shadow-lg p-4 backdrop-blur-sm
+           bg-terminal-black/90 relative overflow-hidden;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  
+  .glow-text {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+    animation: animate-flicker 8s infinite alternate;
+  }
+  
+  .retro-button {
+    @apply font-vt323 transition-all;
+  }
 }
 
 /* Terminal loading animation */
@@ -109,6 +95,16 @@
   }
   100% {
     transform: translate(0);
+  }
+}
+
+/* Animation for the flicker effect */
+@keyframes animate-flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    opacity: 0.9;
+  }
+  20%, 24%, 55% {
+    opacity: 0.4;
   }
 }
 

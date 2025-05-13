@@ -9,7 +9,7 @@ interface PixelContainerProps {
 
 const PixelContainer = ({ children, className }: PixelContainerProps) => {
   return (
-    <div className={cn("terminal-window", className)}>
+    <div className={cn("terminal-window border-terminal-purple bg-terminal-black/90", className)}>
       {children}
     </div>
   );
