@@ -7,12 +7,14 @@ interface DegenRatingProps {
   rating: number;
   maxRating?: number;
   className?: string;
+  readOnly?: boolean;
 }
 
 const DegenRating = ({ 
   rating, 
   maxRating = 5, 
-  className
+  className,
+  readOnly = false
 }: DegenRatingProps) => {
   return (
     <div className={cn("degen-meter flex items-center", className)}>

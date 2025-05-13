@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import { Toaster } from "@/components/ui/toaster";
-import { Circuit, Cpu, Database, Globe, HardDrive, Layers, Monitor, Server, Zap } from 'lucide-react';
+import { CircuitBoard, Cpu, Database, Globe, HardDrive, Layers, Monitor, Server, Zap } from 'lucide-react';
 
 function App() {
   const [animationFrames, setAnimationFrames] = useState<number[]>([]);
@@ -32,7 +32,7 @@ function App() {
                 animationDelay: `${delay * 0.5}s`
               }}
             >
-              {i % 5 === 0 && <Circuit size={16} className="text-terminal-purple/30 animate-pulse-slow" />}
+              {i % 5 === 0 && <CircuitBoard size={16} className="text-terminal-purple/30 animate-pulse-slow" />}
               {i % 5 === 1 && <Database size={16} className="text-terminal-cyan/30 animate-pulse-slow" />}
               {i % 5 === 2 && <Server size={16} className="text-terminal-green/30 animate-pulse-slow" />}
               {i % 5 === 3 && <Cpu size={16} className="text-terminal-purple/30 animate-pulse-slow" />}
@@ -59,7 +59,7 @@ function App() {
               {i % 5 === 1 && <Globe size={16} className="text-terminal-purple/30 animate-pulse-slow" />}
               {i % 5 === 2 && <Monitor size={16} className="text-terminal-green/30 animate-pulse-slow" />}
               {i % 5 === 3 && <Layers size={16} className="text-terminal-purple/30 animate-pulse-slow" />}
-              {i % 5 === 4 && <Circuit size={16} className="text-terminal-cyan/30 animate-pulse-slow" />}
+              {i % 5 === 4 && <CircuitBoard size={16} className="text-terminal-cyan/30 animate-pulse-slow" />}
             </div>
           ))}
         </div>
