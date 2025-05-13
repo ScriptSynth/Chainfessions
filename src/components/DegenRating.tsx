@@ -27,14 +27,36 @@ const DegenRating = ({
           key={index} 
           size={24} 
           className={cn(
-            "skull transition-all",
+            "skull transition-all mr-1",
             index < rating ? "text-terminal-green" : "text-terminal-gray",
             !readOnly && !disabled && "cursor-pointer hover:text-terminal-purple/70",
             disabled && "opacity-50"
           )}
           onClick={() => {
             if (!readOnly && !disabled && onChange) {
+              // Add +1 because index is zero-based but rating is 1-based
               onChange(index + 1);
+            }
+          }}
+          onMouseEnter={() => {
+            // Preview effect on hover (optional)
+            if (!readOnly && !disabled && onChange) {
+              const skulls = document.querySelectorAll('.skull');
+              for (let i = 0; i <= index; i++) {
+                skulls[i].classList.add('text-terminal-purple');
+              }
+            }
+          }}
+          onMouseLeave={() => {
+            // Remove preview effect
+            if (!readOnly && !disabled && onChange) {
+              const skulls = document.querySelectorAll('.skull');
+              skulls.forEach((skull, i) => {
+                skull.classList.remove('text-terminal-purple');
+                if (i < rating) {
+                  skull.classList.add('text-terminal-green');
+                }
+              });
             }
           }}
         />

@@ -25,6 +25,15 @@
   .retro-button {
     @apply font-vt323 transition-all;
   }
+
+  /* New hover scale animation */
+  .animate-hover-scale {
+    transition: transform 0.2s ease;
+  }
+  
+  .animate-hover-scale:hover {
+    transform: scale(1.05);
+  }
 }
 
 /* Terminal loading animation */
@@ -108,6 +117,20 @@
   }
 }
 
+/* Pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s ease-in-out infinite;
+}
+
 /* Typewriter effect enhancements */
 .typewriter-text {
   overflow: hidden;
@@ -134,4 +157,14 @@
   cursor: not-allowed;
   transform: none !important;
   box-shadow: 4px 4px 0px 0px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Button pop effect */
+.retro-button {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+.retro-button:active:not(:disabled) {
+  transform: translateY(2px);
 }
