@@ -4,7 +4,6 @@ import { useToast } from "@/hooks/use-toast";
 import PixelContainer from './PixelContainer';
 import RetroText from './RetroText';
 import RetroButton from './RetroButton';
-import DegenRating from './DegenRating';
 
 const chainOptions = [
   { value: "eth", label: "Ethereum" },
@@ -24,7 +23,7 @@ export interface Confession {
   id: string;
   text: string;
   chain: string;
-  degenRating: number;
+  degenRating: number; // Keeping this in the interface for compatibility
   timestamp: number;
 }
 
@@ -32,8 +31,7 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     text: "",
-    chain: "eth",
-    degenRating: 3
+    chain: "eth"
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -54,7 +52,7 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
     const newConfession = {
       text: formData.text,
       chain: formData.chain,
-      degenRating: formData.degenRating
+      degenRating: 3 // Default value
     };
     
     try {
@@ -63,8 +61,7 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
       // Reset form
       setFormData({
         text: "",
-        chain: "eth",
-        degenRating: 3
+        chain: "eth"
       });
     } catch (error) {
       toast({
@@ -80,8 +77,7 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
   const handleReset = () => {
     setFormData({
       text: "",
-      chain: "eth",
-      degenRating: 3
+      chain: "eth"
     });
   };
 
@@ -102,31 +98,20 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
           />
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <RetroText className="mb-2 text-terminal-cyan">{'>'} SELECT CHAIN</RetroText>
-            <select
-              value={formData.chain}
-              onChange={(e) => setFormData({ ...formData, chain: e.target.value })}
-              className="w-full bg-terminal-darkgray text-terminal-green border-2 border-terminal-purple p-2 font-vt323 text-lg focus:outline-none focus:ring-2 focus:ring-terminal-purple"
-              disabled={isSubmitting}
-            >
-              {chainOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <RetroText className="mb-2 text-terminal-cyan">{'>'} DEGEN RATING</RetroText>
-            <DegenRating
-              rating={formData.degenRating}
-              onChange={(rating) => setFormData({ ...formData, degenRating: rating })}
-              disabled={isSubmitting}
-            />
-          </div>
+        <div>
+          <RetroText className="mb-2 text-terminal-cyan">{'>'} SELECT CHAIN</RetroText>
+          <select
+            value={formData.chain}
+            onChange={(e) => setFormData({ ...formData, chain: e.target.value })}
+            className="w-full bg-terminal-darkgray text-terminal-green border-2 border-terminal-purple p-2 font-vt323 text-lg focus:outline-none focus:ring-2 focus:ring-terminal-purple"
+            disabled={isSubmitting}
+          >
+            {chainOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
         
         <div className="flex gap-4">

@@ -44,6 +44,7 @@ const Index = () => {
         toast({
           title: "Confession submitted!",
           description: "Your secret is safe on the chain now...",
+          duration: 5000 // Auto dismiss after 5 seconds
         });
       } else {
         throw new Error('Failed to save confession');
@@ -53,13 +54,14 @@ const Index = () => {
       toast({
         title: "Submission failed",
         description: "There was a problem submitting your confession. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 5000 // Auto dismiss after 5 seconds
       });
     }
   };
 
   return (
-    <div className="min-h-screen px-4 py-8 max-w-4xl mx-auto">
+    <div className="min-h-screen px-4 py-8 max-w-3xl mx-auto">
       <Header />
       
       <main className="mt-8">

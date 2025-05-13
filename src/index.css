@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
 @tailwind base;
@@ -33,6 +32,26 @@
   
   .animate-hover-scale:hover {
     transform: scale(1.15);
+  }
+  
+  /* Cyberpunk grid background */
+  .bg-cyberpunk-grid {
+    background-size: 50px 50px;
+    background-image: 
+      linear-gradient(to right, rgba(155, 135, 245, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(155, 135, 245, 0.1) 1px, transparent 1px);
+  }
+  
+  /* Scanline effect */
+  .bg-scanline {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(30, 174, 219, 0.05) 50%,
+      transparent 100%
+    );
+    background-size: 100% 4px;
+    animation: scanlines 8s linear infinite;
   }
 }
 
@@ -71,6 +90,121 @@
   animation: glitch 0.5s cubic-bezier(.25, .46, .45, .94) both;
 }
 
+/* Scanline animation */
+@keyframes scanlines {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+/* Animation for the flicker effect */
+@keyframes animate-flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    opacity: 0.9;
+  }
+  20%, 24%, 55% {
+    opacity: 0.4;
+  }
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+/* Floating animation for decorative elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* CRT flicker for screen elements */
+@keyframes crt-flicker {
+  0% {
+    opacity: 0.97;
+  }
+  5% {
+    opacity: 0.9;
+  }
+  10% {
+    opacity: 0.97;
+  }
+  15% {
+    opacity: 0.92;
+  }
+  20% {
+    opacity: 0.98;
+  }
+  25% {
+    opacity: 0.91;
+  }
+  30% {
+    opacity: 0.98;
+  }
+  45% {
+    opacity: 0.94;
+  }
+  70% {
+    opacity: 0.98;
+  }
+  80% {
+    opacity: 0.94;
+  }
+  90% {
+    opacity: 0.96;
+  }
+  100% {
+    opacity: 0.98;
+  }
+}
+
+.animate-crt-flicker {
+  animation: crt-flicker 4s linear infinite;
+}
+
+/* Code rain animation for background elements */
+@keyframes code-rain {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.5;
+  }
+  95% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.animate-code-rain {
+  animation: code-rain 8s linear infinite;
+}
+
+/* Enhanced glitch animation */
 @keyframes glitch {
   0% {
     transform: translate(0);
