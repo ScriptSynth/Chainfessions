@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Skull } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,47 +20,45 @@ const DegenRating = ({
   readOnly = false,
   disabled = false
 }: DegenRatingProps) => {
+  const [hoverRating, setHoverRating] = useState(0);
+  
+  const handleRatingClick = (selectedRating: number) => {
+    if (!readOnly && !disabled && onChange) {
+      onChange(selectedRating);
+    }
+  };
+
   return (
-    <div className={cn("degen-meter flex", className)}>
-      {Array.from({ length: maxRating }).map((_, index) => (
-        <Skull 
-          key={index} 
-          size={24} 
-          className={cn(
-            "skull transition-all mr-1",
-            index < rating ? "text-terminal-green" : "text-terminal-gray",
-            !readOnly && !disabled && "cursor-pointer hover:text-terminal-purple/70",
-            disabled && "opacity-50"
-          )}
-          onClick={() => {
-            if (!readOnly && !disabled && onChange) {
-              // Add +1 because index is zero-based but rating is 1-based
-              onChange(index + 1);
-            }
-          }}
-          onMouseEnter={() => {
-            // Preview effect on hover (optional)
-            if (!readOnly && !disabled && onChange) {
-              const skulls = document.querySelectorAll('.skull');
-              for (let i = 0; i <= index; i++) {
-                skulls[i].classList.add('text-terminal-purple');
+    <div className={cn("degen-meter flex items-center", className)}>
+      {Array.from({ length: maxRating }).map((_, index) => {
+        const skullRating = index + 1; // Convert to 1-based rating
+        const isActive = skullRating <= (hoverRating || rating);
+        
+        return (
+          <Skull 
+            key={index} 
+            size={24} 
+            className={cn(
+              "skull transition-all mr-1 cursor-pointer",
+              isActive ? "text-terminal-green" : "text-terminal-gray",
+              !readOnly && !disabled && "hover:scale-110 hover:animate-pulse",
+              disabled && "opacity-50",
+              "animate-hover-scale"
+            )}
+            onClick={() => handleRatingClick(skullRating)}
+            onMouseEnter={() => {
+              if (!readOnly && !disabled) {
+                setHoverRating(skullRating);
               }
-            }
-          }}
-          onMouseLeave={() => {
-            // Remove preview effect
-            if (!readOnly && !disabled && onChange) {
-              const skulls = document.querySelectorAll('.skull');
-              skulls.forEach((skull, i) => {
-                skull.classList.remove('text-terminal-purple');
-                if (i < rating) {
-                  skull.classList.add('text-terminal-green');
-                }
-              });
-            }
-          }}
-        />
-      ))}
+            }}
+            onMouseLeave={() => {
+              if (!readOnly && !disabled) {
+                setHoverRating(0);
+              }
+            }}
+          />
+        );
+      })}
     </div>
   );
 };

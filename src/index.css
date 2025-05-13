@@ -26,13 +26,13 @@
     @apply font-vt323 transition-all;
   }
 
-  /* New hover scale animation */
+  /* Enhanced hover scale animation */
   .animate-hover-scale {
-    transition: transform 0.2s ease;
+    transition: transform 0.15s ease;
   }
   
   .animate-hover-scale:hover {
-    transform: scale(1.05);
+    transform: scale(1.15);
   }
 }
 
@@ -129,6 +129,38 @@
 
 .animate-pulse-slow {
   animation: pulse 3s ease-in-out infinite;
+}
+
+/* Skull hover animation */
+.skull {
+  transition: all 0.2s ease;
+}
+
+.skull:hover {
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+/* Toast animations */
+.toast-enter {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.toast-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.toast-exit {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast-exit-active {
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.3s ease;
 }
 
 /* Typewriter effect enhancements */

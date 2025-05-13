@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Confession } from "@/components/ConfessionForm";
 
@@ -17,6 +16,50 @@ export interface Reply {
   text: string;
   createdAt: number;
 }
+
+// Local storage key for tracking user reactions
+const REACTIONS_STORAGE_KEY = 'user_reactions';
+
+// Helper to get user's reactions from local storage
+const getUserReactions = (): Record<string, ReactionType[]> => {
+  try {
+    const stored = localStorage.getItem(REACTIONS_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch (error) {
+    console.error('Error reading user reactions from local storage:', error);
+    return {};
+  }
+};
+
+// Helper to save user reactions to local storage
+const saveUserReaction = (confessionId: string, reactionType: ReactionType): void => {
+  try {
+    const userReactions = getUserReactions();
+    
+    if (!userReactions[confessionId]) {
+      userReactions[confessionId] = [];
+    }
+    
+    // Only add if not already reacted with this type
+    if (!userReactions[confessionId].includes(reactionType)) {
+      userReactions[confessionId].push(reactionType);
+      localStorage.setItem(REACTIONS_STORAGE_KEY, JSON.stringify(userReactions));
+    }
+  } catch (error) {
+    console.error('Error saving user reaction to local storage:', error);
+  }
+};
+
+// Helper to check if user already reacted
+export const hasUserReacted = (confessionId: string, reactionType: ReactionType): boolean => {
+  try {
+    const userReactions = getUserReactions();
+    return userReactions[confessionId]?.includes(reactionType) || false;
+  } catch (error) {
+    console.error('Error checking user reaction:', error);
+    return false;
+  }
+};
 
 export async function getConfessions(): Promise<Confession[]> {
   const { data, error } = await supabase
@@ -98,7 +141,7 @@ export async function getRandomConfession(): Promise<Confession | null> {
   };
 }
 
-// Reaction functions
+// Updated reaction functions
 export async function getReactions(confessionId: string): Promise<Reaction[]> {
   const { data, error } = await supabase
     .from('reactions')
@@ -119,6 +162,12 @@ export async function getReactions(confessionId: string): Promise<Reaction[]> {
 }
 
 export async function addReaction(confessionId: string, reactionType: ReactionType): Promise<Reaction | null> {
+  // Check if user already reacted with this type
+  if (hasUserReacted(confessionId, reactionType)) {
+    console.log('User already reacted with this type:', reactionType);
+    return null;
+  }
+  
   const { data, error } = await supabase
     .from('reactions')
     .insert({
@@ -132,6 +181,9 @@ export async function addReaction(confessionId: string, reactionType: ReactionTy
     console.error('Error adding reaction:', error);
     return null;
   }
+  
+  // Save to local storage to prevent duplicate reactions
+  saveUserReaction(confessionId, reactionType);
   
   return {
     id: data.id,
