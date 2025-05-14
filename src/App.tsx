@@ -33,7 +33,7 @@ function App() {
               }}
             >
               {i % 5 === 0 && <CircuitBoard size={16} className="text-terminal-purple/30 animate-pulse-slow" />}
-              {i % 5 === 1 && <Database size={16} className="text-terminal-cyan/30 animate-pulse-slow" />}
+              {i % 5 === 1 && <Database size={16} className="text-terminal-purple/30 animate-pulse-slow" />}
               {i % 5 === 2 && <Server size={16} className="text-terminal-green/30 animate-pulse-slow" />}
               {i % 5 === 3 && <Cpu size={16} className="text-terminal-purple/30 animate-pulse-slow" />}
               {i % 5 === 4 && <HardDrive size={16} className="text-terminal-green/30 animate-pulse-slow" />}

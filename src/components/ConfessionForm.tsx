@@ -23,7 +23,7 @@ export interface Confession {
   id: string;
   text: string;
   chain: string;
-  degenRating: number; // Keeping this in the interface for compatibility
+  degenRating?: number; // Optional now
   timestamp: number;
 }
 
@@ -52,7 +52,6 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
     const newConfession = {
       text: formData.text,
       chain: formData.chain,
-      degenRating: 3 // Default value
     };
     
     try {
