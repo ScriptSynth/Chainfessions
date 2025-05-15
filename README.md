@@ -1,73 +1,38 @@
-# Welcome to your Lovable project
+# Chainfessions — Confess your crypto sins 👾
 
-## Project info
+**Chainfessions** is a fun, **retro-themed website** where users can anonymously confess their wildest, funniest, or deepest secrets about things they've done on the blockchain — no usernames, no tracking, just pure anonymous storytelling.
 
-**URL**: https://lovable.dev/projects/df54decc-0e0b-46d7-bacf-8a76ade7db17
+Built with **privacy-first principles** and styled like a vintage **arcade game**, the platform invites the crypto community to share their on-chain “confessions” while interacting with others through anonymous reactions and replies. Perfect for degens who want to share stories of pumps, dumps, rug pulls, or general blockchain chaos — all while enjoying a pixel-art inspired environment.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **Anonymous Confessions:** Submit blockchain stories without any login or identity tracking.
+- **Retro Game UI:** Nostalgic pixel-art arcade style for a fun, immersive experience.
+- **Reaction Buttons:** React anonymously with emojis like laugh, fire, skull, and flag.
+- **Anonymous Replies:** Engage in honest discussions while keeping identities hidden.
+- **Real-time Updates:** Confessions, reactions, and replies update live for dynamic community engagement.
+- **Leaderboard:** Highlights the most popular confessions for gamification.(soon)
+- **Moderation Tools:** Flag inappropriate content without compromising anonymity.
+- **Secure Backend:** Powered by Supabase with row-level security policies.
+- **Optional Wallet Connect:** For future NFT rewards and on-chain gamification without revealing confessions.(soon)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/df54decc-0e0b-46d7-bacf-8a76ade7db17) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## Tech Stack
 
-**Use your preferred IDE**
+- **Frontend:** React, TailwindCSS, Vite  
+- **Backend:** Supabase / PostgreSQL
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- ## Future Roadmap
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- On-chain confession proof using zero-knowledge proofs  
+- Mintable NFT badges for top confessors  
+- DAO-powered moderation and curation  
+- Interactive mini-games based on confession themes  
+- Social sharing with stylish confession cards  
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/df54decc-0e0b-46d7-bacf-8a76ade7db17) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Feel free to contribute, suggest features, or report bugs to help build a fun, anonymous, and vibrant Chainfessions community!
