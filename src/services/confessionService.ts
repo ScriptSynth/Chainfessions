@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Confession } from "@/components/ConfessionForm";
 
@@ -14,6 +15,14 @@ export interface Reply {
   id: string;
   confessionId: string;
   text: string;
+  createdAt: number;
+}
+
+export interface Media {
+  id: string;
+  confessionId: string;
+  mediaUrl: string;
+  mediaType: string;
   createdAt: number;
 }
 
@@ -81,29 +90,85 @@ export async function getConfessions(): Promise<Confession[]> {
   }));
 }
 
-export async function addConfession(confession: Omit<Confession, 'id' | 'timestamp'>): Promise<Confession | null> {
-  const { data, error } = await supabase
-    .from('confessions')
-    .insert({
-      text: confession.text,
-      chain: confession.chain,
-      degen_rating: confession.degenRating
-    })
-    .select()
-    .single();
+export async function uploadMedia(file: File, userId: string): Promise<string | null> {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `media/${fileName}`;
     
-  if (error) {
-    console.error('Error adding confession:', error);
+    // Upload the file to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from('confession-media')
+      .upload(filePath, file);
+      
+    if (uploadError) {
+      throw uploadError;
+    }
+    
+    // Get the public URL for the uploaded file
+    const { data } = supabase.storage
+      .from('confession-media')
+      .getPublicUrl(filePath);
+      
+    return data.publicUrl;
+  } catch (error) {
+    console.error('Error uploading media:', error);
     return null;
   }
-  
-  return {
-    id: data.id,
-    text: data.text,
-    chain: data.chain,
-    degenRating: data.degen_rating,
-    timestamp: new Date(data.timestamp).getTime()
-  };
+}
+
+export async function addConfession(
+  confession: Omit<Confession, 'id' | 'timestamp'>, 
+  userId: string,
+  mediaFile?: File
+): Promise<Confession | null> {
+  try {
+    // First, upload media if provided
+    let mediaUrl = null;
+    if (mediaFile) {
+      mediaUrl = await uploadMedia(mediaFile, userId);
+    }
+    
+    // Insert confession
+    const { data, error } = await supabase
+      .from('confessions')
+      .insert({
+        text: confession.text,
+        chain: confession.chain,
+        degen_rating: confession.degenRating,
+        user_id: userId
+      })
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Error adding confession:', error);
+      return null;
+    }
+    
+    // If media was uploaded, link it to the confession
+    if (mediaUrl && data.id) {
+      const mediaType = mediaFile!.type;
+      await supabase
+        .from('media')
+        .insert({
+          confession_id: data.id,
+          media_url: mediaUrl,
+          media_type: mediaType
+        });
+    }
+    
+    return {
+      id: data.id,
+      text: data.text,
+      chain: data.chain,
+      degenRating: data.degen_rating,
+      timestamp: new Date(data.timestamp).getTime()
+    };
+  } catch (error) {
+    console.error('Error in addConfession:', error);
+    return null;
+  }
 }
 
 export async function getRandomConfession(): Promise<Confession | null> {
@@ -138,6 +203,32 @@ export async function getRandomConfession(): Promise<Confession | null> {
     chain: data.chain,
     degenRating: data.degen_rating,
     timestamp: new Date(data.timestamp).getTime()
+  };
+}
+
+// Media functions
+export async function getConfessionMedia(confessionId: string): Promise<Media | null> {
+  const { data, error } = await supabase
+    .from('media')
+    .select('*')
+    .eq('confession_id', confessionId)
+    .single();
+    
+  if (error) {
+    // No media found is a normal case
+    if (error.code === 'PGRST116') {
+      return null;
+    }
+    console.error('Error fetching media:', error);
+    return null;
+  }
+  
+  return {
+    id: data.id,
+    confessionId: data.confession_id,
+    mediaUrl: data.media_url,
+    mediaType: data.media_type,
+    createdAt: new Date(data.created_at).getTime()
   };
 }
 

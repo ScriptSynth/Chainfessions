@@ -6,7 +6,16 @@ import RetroText from './RetroText';
 import DegenRating from './DegenRating';
 import ReactionButton from './ReactionButton';
 import ReplyForm from './ReplyForm';
-import { addReaction, getReactions, getReplies, ReactionType, Reaction, Reply } from '@/services/confessionService';
+import { 
+  addReaction,
+  getReactions,
+  getReplies, 
+  getConfessionMedia,
+  ReactionType, 
+  Reaction, 
+  Reply,
+  Media
+} from '@/services/confessionService';
 import { useToast } from "@/hooks/use-toast";
 
 interface ConfessionCardProps {
@@ -63,11 +72,14 @@ const ConfessionCard = ({ confession, isRandom = false }: ConfessionCardProps) =
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [isLoadingReactions, setIsLoadingReactions] = useState(false);
   const [isLoadingReplies, setIsLoadingReplies] = useState(false);
+  const [media, setMedia] = useState<Media | null>(null);
+  const [isLoadingMedia, setIsLoadingMedia] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     if (!isRandom) {
       loadReactions();
+      loadMedia();
     }
   }, [confession.id, isRandom]);
 
@@ -80,6 +92,18 @@ const ConfessionCard = ({ confession, isRandom = false }: ConfessionCardProps) =
       console.error('Error loading reactions:', error);
     } finally {
       setIsLoadingReactions(false);
+    }
+  };
+
+  const loadMedia = async () => {
+    setIsLoadingMedia(true);
+    try {
+      const media = await getConfessionMedia(confession.id);
+      setMedia(media);
+    } catch (error) {
+      console.error('Error loading media:', error);
+    } finally {
+      setIsLoadingMedia(false);
     }
   };
 
@@ -130,6 +154,10 @@ const ConfessionCard = ({ confession, isRandom = false }: ConfessionCardProps) =
     await loadReplies();
   };
 
+  const isMediaImage = (mediaType?: string) => {
+    return mediaType?.startsWith('image/');
+  };
+
   return (
     <PixelContainer 
       className={`w-full mb-4 transition-all ${isRandom ? 'animate-glitch' : 'hover:scale-[1.01]'}`}
@@ -148,6 +176,17 @@ const ConfessionCard = ({ confession, isRandom = false }: ConfessionCardProps) =
       <RetroText className={`my-4 text-xl ${isRandom ? 'typewriter-text' : ''}`}>
         {confession.text}
       </RetroText>
+      
+      {!isLoadingMedia && media && isMediaImage(media.mediaType) && (
+        <div className="mt-4 mb-4 border-2 border-terminal-purple p-2 bg-terminal-darkgray/30">
+          <img 
+            src={media.mediaUrl} 
+            alt="Confession media" 
+            className="max-h-80 mx-auto"
+            loading="lazy"
+          />
+        </div>
+      )}
       
       {!isRandom && (
         <div className="mt-6 border-t border-terminal-purple/20 pt-3">

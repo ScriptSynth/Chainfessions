@@ -16,6 +16,7 @@ export type Database = {
           id: string
           text: string
           timestamp: string
+          user_id: string | null
         }
         Insert: {
           chain: string
@@ -23,6 +24,7 @@ export type Database = {
           id?: string
           text: string
           timestamp?: string
+          user_id?: string | null
         }
         Update: {
           chain?: string
@@ -30,6 +32,63 @@ export type Database = {
           id?: string
           text?: string
           timestamp?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      media: {
+        Row: {
+          confession_id: string
+          created_at: string
+          id: string
+          media_type: string
+          media_url: string
+        }
+        Insert: {
+          confession_id: string
+          created_at?: string
+          id?: string
+          media_type: string
+          media_url: string
+        }
+        Update: {
+          confession_id?: string
+          created_at?: string
+          id?: string
+          media_type?: string
+          media_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_confession_id_fkey"
+            columns: ["confession_id"]
+            isOneToOne: false
+            referencedRelation: "confessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string
         }
         Relationships: []
       }

@@ -6,11 +6,13 @@ import ConfessionTabs from '@/components/ConfessionTabs';
 import { Confession } from '@/components/ConfessionForm';
 import { getConfessions, addConfession as addConfessionToDb } from '@/services/confessionService';
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
   const [confessions, setConfessions] = useState<Confession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Load confessions from Supabase on mount
   useEffect(() => {
@@ -35,9 +37,18 @@ const Index = () => {
   }, [toast]);
 
   // Handle new confession submissions
-  const handleSubmitConfession = async (newConfession: Omit<Confession, 'id' | 'timestamp'>) => {
+  const handleSubmitConfession = async (newConfession: Omit<Confession, 'id' | 'timestamp'>, mediaFile?: File) => {
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please login to submit a confession",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      const savedConfession = await addConfessionToDb(newConfession);
+      const savedConfession = await addConfessionToDb(newConfession, user.id, mediaFile);
       
       if (savedConfession) {
         setConfessions(prev => [savedConfession, ...prev]);

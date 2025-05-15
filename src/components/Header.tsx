@@ -1,22 +1,40 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import RetroText from './RetroText';
+import RetroButton from './RetroButton';
 
 const Header = () => {
+  const { user } = useAuth();
+  
   return (
-    <header className="py-8 text-center">
-      <RetroText className="text-5xl font-press-start text-terminal-purple mb-4 glow-text">
-        CHAINFESSIONS
-      </RetroText>
-      
-      <RetroText className="text-xl text-terminal-cyan mb-8">
-        {'>'} Confess your blockchain secrets anonymously
-      </RetroText>
-      
-      <div className="max-w-2xl mx-auto px-4">
-        <RetroText className="text-sm text-terminal-green/80 border-2 border-terminal-purple/30 p-4 bg-terminal-darkpurple/30">
-          We store no IPs. We don't care who you are. Just confess your crypto sins and sleep better tonight.
+    <header className="flex flex-col md:flex-row items-center justify-between">
+      <div className="text-center md:text-left mb-4 md:mb-0">
+        <Link to="/">
+          <RetroText glowing className="text-5xl text-terminal-purple">
+            CHAINFESSIONS
+          </RetroText>
+        </Link>
+        <RetroText className="mt-2 text-terminal-cyan">
+          Confess your crypto sins, anon
         </RetroText>
+      </div>
+      
+      <div className="flex space-x-4 items-center">
+        {user ? (
+          <Link to="/profile">
+            <RetroButton>
+              MY PROFILE
+            </RetroButton>
+          </Link>
+        ) : (
+          <Link to="/auth">
+            <RetroButton>
+              LOGIN / REGISTER
+            </RetroButton>
+          </Link>
+        )}
       </div>
     </header>
   );
