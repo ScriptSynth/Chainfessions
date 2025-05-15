@@ -10,15 +10,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Confession } from '@/components/ConfessionForm';
 import ConfessionCard from '@/components/ConfessionCard';
+import { Card, CardContent } from '@/components/ui/card';
+import { CircuitBoard, User } from 'lucide-react';
 
 const Profile = () => {
   const { user, profile, loading, signOut, updateProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [username, setUsername] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [userConfessions, setUserConfessions] = useState<Confession[]>([]);
   const [isLoadingConfessions, setIsLoadingConfessions] = useState(true);
@@ -32,7 +31,6 @@ const Profile = () => {
     // Initialize form with current profile data
     if (profile) {
       setUsername(profile.username || '');
-      setAvatarUrl(profile.avatar_url || null);
     }
   }, [user, profile, loading, navigate]);
 
@@ -73,63 +71,6 @@ const Profile = () => {
     }
   };
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.size > 2 * 1024 * 1024) { // 2MB limit
-        toast({
-          title: "File too large",
-          description: "Avatar image should be less than 2MB",
-          variant: "destructive"
-        });
-        return;
-      }
-      setAvatarFile(file);
-      
-      // Preview image
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setAvatarUrl(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const uploadAvatar = async () => {
-    if (!avatarFile || !user) return null;
-    
-    setIsUploading(true);
-    const fileExt = avatarFile.name.split('.').pop();
-    const filePath = `avatars/${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    
-    try {
-      const { error: uploadError } = await supabase.storage
-        .from('confession-media')
-        .upload(filePath, avatarFile);
-        
-      if (uploadError) {
-        throw uploadError;
-      }
-      
-      // Get public URL
-      const { data } = supabase.storage
-        .from('confession-media')
-        .getPublicUrl(filePath);
-        
-      return data.publicUrl;
-    } catch (error) {
-      console.error('Avatar upload error:', error);
-      toast({
-        title: "Avatar upload failed",
-        description: "There was a problem uploading your avatar",
-        variant: "destructive"
-      });
-      return null;
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -137,17 +78,9 @@ const Profile = () => {
     setIsSaving(true);
     
     try {
-      // Upload avatar if changed
-      let newAvatarUrl = profile?.avatar_url;
-      if (avatarFile) {
-        newAvatarUrl = await uploadAvatar();
-        if (!newAvatarUrl) return;
-      }
-      
       // Update profile
       await updateProfile({
         username,
-        avatar_url: newAvatarUrl,
       } as any);
       
       toast({
@@ -183,95 +116,87 @@ const Profile = () => {
     <div className="min-h-screen px-4 py-8 max-w-3xl mx-auto">
       <Header />
       
-      <main className="mt-8">
-        <PixelContainer className="w-full max-w-2xl mx-auto mb-8">
-          <RetroText glowing className="text-2xl mb-6 text-terminal-purple">
-            {'>'} YOUR PROFILE
-          </RetroText>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <RetroText className="mb-2 text-terminal-cyan">{'>'} USERNAME</RetroText>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="w-full bg-terminal-darkgray text-terminal-green border-2 border-terminal-purple p-2 font-vt323 text-lg focus:outline-none focus:ring-2 focus:ring-terminal-purple"
-                disabled={isSaving}
-              />
+      <main className="mt-8 space-y-8">
+        <Card className="border-2 border-terminal-purple bg-terminal-black/90 backdrop-blur-sm shadow-lg shadow-terminal-purple/20">
+          <CardContent className="p-6">
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 bg-terminal-purple/20 rounded-full flex items-center justify-center mr-4 animate-pulse-slow">
+                <User className="text-terminal-purple" size={24} />
+              </div>
+              <RetroText glowing className="text-2xl text-terminal-purple">
+                YOUR PROFILE
+              </RetroText>
             </div>
             
-            <div>
-              <RetroText className="mb-2 text-terminal-cyan">{'>'} AVATAR</RetroText>
-              <div className="flex items-center space-x-4">
-                <div className="w-24 h-24 border-2 border-terminal-purple flex items-center justify-center overflow-hidden">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <RetroText className="text-terminal-purple/50">No Avatar</RetroText>
-                  )}
-                </div>
-                <div>
-                  <label className="cursor-pointer">
-                    <RetroButton type="button" className="text-sm">
-                      {avatarUrl ? 'Change Avatar' : 'Upload Avatar'}
-                    </RetroButton>
-                    <input
-                      type="file"
-                      onChange={handleAvatarChange}
-                      accept="image/*"
-                      className="hidden"
-                      disabled={isSaving || isUploading}
-                    />
-                  </label>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="relative">
+                <RetroText className="mb-2 text-terminal-cyan">{'>'} USERNAME</RetroText>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  className="w-full bg-terminal-darkgray text-terminal-green border-2 border-terminal-purple p-3 font-vt323 text-lg focus:outline-none focus:ring-2 focus:ring-terminal-purple rounded shadow-inner"
+                  disabled={isSaving}
+                  placeholder="Enter your username"
+                />
+                <div className="absolute right-3 top-9">
+                  <CircuitBoard size={16} className="text-terminal-purple/70" />
                 </div>
               </div>
-            </div>
-            
-            <div className="flex gap-4 pt-4">
-              <RetroButton type="submit" disabled={isSaving || isUploading}>
-                {isSaving ? 'SAVING...' : 'SAVE PROFILE'}
-              </RetroButton>
               
-              <RetroButton 
-                type="button"
-                onClick={handleSignOut}
-                className="bg-terminal-darkgray border-red-500 shadow-[4px_4px_0px_0px_rgba(239,68,68,1)] hover:shadow-[2px_2px_0px_0px_rgba(239,68,68,1)]"
-              >
-                LOGOUT
-              </RetroButton>
-            </div>
-          </form>
-        </PixelContainer>
+              <div className="flex gap-4 pt-4">
+                <RetroButton 
+                  type="submit" 
+                  disabled={isSaving}
+                  className="bg-gradient-to-r from-terminal-purple to-violet-600 border-none shadow-[0_0_15px_rgba(139,92,246,0.5)]"
+                >
+                  {isSaving ? 'SAVING...' : 'SAVE PROFILE'}
+                </RetroButton>
+                
+                <RetroButton 
+                  type="button"
+                  onClick={handleSignOut}
+                  className="bg-gradient-to-r from-red-600 to-red-500 border-none shadow-[0_0_15px_rgba(220,38,38,0.3)] shadow-red-500/30"
+                >
+                  LOGOUT
+                </RetroButton>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
         
-        <PixelContainer className="w-full max-w-2xl mx-auto">
-          <RetroText glowing className="text-2xl mb-6 text-terminal-purple">
-            {'>'} YOUR CONFESSIONS
-          </RetroText>
-          
-          {isLoadingConfessions ? (
-            <div className="py-10 text-center">
-              <RetroText className="text-terminal-green animate-pulse">Loading your confessions...</RetroText>
-            </div>
-          ) : userConfessions.length === 0 ? (
-            <div className="py-10 text-center">
-              <RetroText className="text-terminal-purple/60">You haven't made any confessions yet.</RetroText>
-              <RetroButton 
-                className="mt-4"
-                onClick={() => navigate('/')}
-              >
-                MAKE A CONFESSION
-              </RetroButton>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {userConfessions.map(confession => (
-                <ConfessionCard key={confession.id} confession={confession} />
-              ))}
-            </div>
-          )}
-        </PixelContainer>
+        <Card className="border-2 border-terminal-purple bg-terminal-black/90 backdrop-blur-sm shadow-lg shadow-terminal-purple/20">
+          <CardContent className="p-6">
+            <RetroText glowing className="text-2xl mb-6 text-terminal-purple">
+              {'>'} YOUR CONFESSIONS
+            </RetroText>
+            
+            {isLoadingConfessions ? (
+              <div className="py-10 text-center">
+                <div className="inline-block terminal-loading px-6">
+                  <RetroText className="text-terminal-green animate-pulse">Loading your confessions...</RetroText>
+                </div>
+              </div>
+            ) : userConfessions.length === 0 ? (
+              <div className="py-10 text-center border-2 border-dashed border-terminal-purple/30 rounded-lg">
+                <RetroText className="text-terminal-purple/60">You haven't made any confessions yet.</RetroText>
+                <RetroButton 
+                  className="mt-4 bg-gradient-to-r from-terminal-purple to-violet-600 border-none shadow-[0_0_15px_rgba(139,92,246,0.5)]"
+                  onClick={() => navigate('/')}
+                >
+                  MAKE A CONFESSION
+                </RetroButton>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {userConfessions.map(confession => (
+                  <ConfessionCard key={confession.id} confession={confession} />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
