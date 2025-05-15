@@ -6,6 +6,7 @@ import PixelContainer from './PixelContainer';
 import RetroText from './RetroText';
 import RetroButton from './RetroButton';
 import { Upload, ImageIcon, X } from 'lucide-react';
+import { Button } from "./ui/button";
 
 const chainOptions = [
   { value: "eth", label: "Ethereum" },
@@ -66,6 +67,7 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
     const newConfession = {
       text: formData.text,
       chain: formData.chain,
+      degenRating: 1 // Add default degenRating to fix the null constraint issue
     };
     
     try {
@@ -87,15 +89,6 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleReset = () => {
-    setFormData({
-      text: "",
-      chain: "eth"
-    });
-    setMediaFile(null);
-    setMediaPreview(null);
   };
 
   const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,28 +132,29 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
   };
 
   return (
-    <PixelContainer className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto bg-gradient-to-b from-terminal-purple/10 to-terminal-darkgray p-6 rounded-lg shadow-xl backdrop-blur-sm border border-terminal-purple/30">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <RetroText glowing className="text-2xl mb-2 text-terminal-purple">
-            {'>'} NEW CONFESSION
-          </RetroText>
+          <h2 className="text-2xl mb-4 text-white font-bold flex items-center">
+            <span className="bg-terminal-purple text-white px-3 py-1 rounded mr-2">NEW</span> 
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-terminal-purple to-terminal-cyan">CONFESSION</span>
+          </h2>
           
           <textarea
             value={formData.text}
             onChange={(e) => setFormData({ ...formData, text: e.target.value })}
-            className="w-full h-40 bg-terminal-darkgray text-terminal-green border-2 border-terminal-purple p-3 font-vt323 text-lg focus:outline-none focus:ring-2 focus:ring-terminal-purple"
+            className="w-full h-40 bg-terminal-darkgray/80 text-terminal-green border border-terminal-purple/50 p-4 rounded-md font-vt323 text-lg focus:outline-none focus:ring-2 focus:ring-terminal-purple transition-all shadow-inner"
             placeholder="I panic sold at the bottom and told everyone I diamond handed..."
             disabled={isSubmitting}
           />
         </div>
         
         <div>
-          <RetroText className="mb-2 text-terminal-cyan">{'>'} SELECT CHAIN</RetroText>
+          <label className="block mb-2 text-terminal-cyan font-medium">SELECT CHAIN</label>
           <select
             value={formData.chain}
             onChange={(e) => setFormData({ ...formData, chain: e.target.value })}
-            className="w-full bg-terminal-darkgray text-terminal-green border-2 border-terminal-purple p-2 font-vt323 text-lg focus:outline-none focus:ring-2 focus:ring-terminal-purple"
+            className="w-full bg-terminal-darkgray/80 text-terminal-green border border-terminal-purple/50 p-3 rounded-md font-vt323 text-lg focus:outline-none focus:ring-2 focus:ring-terminal-purple transition-all"
             disabled={isSubmitting}
           >
             {chainOptions.map((option) => (
@@ -172,26 +166,26 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
         </div>
         
         <div>
-          <RetroText className="mb-2 text-terminal-cyan">{'>'} ATTACH MEDIA (OPTIONAL)</RetroText>
+          <label className="block mb-2 text-terminal-cyan font-medium">ATTACH MEDIA (OPTIONAL)</label>
           
           {mediaPreview ? (
-            <div className="relative border-2 border-terminal-purple p-2 mb-4">
-              <img src={mediaPreview} alt="Preview" className="max-h-64 mx-auto" />
+            <div className="relative border border-terminal-purple/50 rounded-md p-2 mb-4 bg-terminal-darkgray/40">
+              <img src={mediaPreview} alt="Preview" className="max-h-64 mx-auto rounded" />
               <button
                 type="button"
                 onClick={removeMedia}
-                className="absolute top-2 right-2 bg-terminal-purple text-terminal-black p-1 rounded-full"
+                className="absolute top-2 right-2 bg-terminal-purple text-white p-1 rounded-full hover:bg-terminal-purple/80 transition-colors"
                 disabled={isSubmitting}
               >
                 <X size={16} />
               </button>
             </div>
           ) : (
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-terminal-purple bg-terminal-darkgray rounded-lg cursor-pointer hover:bg-terminal-purple/10">
+            <label className="flex flex-col items-center justify-center w-full h-32 border border-dashed border-terminal-purple/50 bg-terminal-darkgray/40 rounded-md cursor-pointer hover:bg-terminal-darkgray/60 transition-colors">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <ImageIcon className="w-10 h-10 mb-3 text-terminal-purple" />
-                <RetroText className="mb-2 text-sm text-terminal-purple"><span className="font-semibold">Click to upload</span> image or GIF</RetroText>
-                <RetroText className="text-xs text-terminal-purple/60">PNG, JPG, WEBP or GIF (MAX. 5MB)</RetroText>
+                <p className="mb-2 text-sm text-terminal-purple"><span className="font-semibold">Click to upload</span> image or GIF</p>
+                <p className="text-xs text-terminal-purple/60">PNG, JPG, WEBP or GIF (MAX. 5MB)</p>
               </div>
               <input 
                 type="file" 
@@ -204,30 +198,25 @@ const ConfessionForm = ({ onSubmitConfession }: ConfessionFormProps) => {
           )}
         </div>
         
-        <div className="flex gap-4">
-          <RetroButton type="submit" disabled={isSubmitting || !user}>
-            {isSubmitting ? 'SUBMITTING...' : 'Submit Confession'}
-          </RetroButton>
-          
-          <RetroButton 
-            onClick={handleReset} 
-            className="bg-terminal-darkgray border-terminal-lightpurple shadow-[4px_4px_0px_0px_rgba(126,105,171,1)] hover:shadow-[2px_2px_0px_0px_rgba(126,105,171,1)]"
-            disabled={isSubmitting}
-            type="button"
+        <div>
+          <Button
+            type="submit"
+            disabled={isSubmitting || !user}
+            className="w-full bg-gradient-to-r from-terminal-purple to-terminal-cyan hover:opacity-90 text-white font-bold py-3 px-8 rounded-md transition-all shadow-lg hover:shadow-terminal-purple/30 hover:translate-y-[-2px]"
           >
-            Confess Again
-          </RetroButton>
+            {isSubmitting ? 'SUBMITTING...' : 'SUBMIT CONFESSION'}
+          </Button>
         </div>
         
         {!user && (
-          <div className="mt-2 p-3 bg-terminal-purple/10 border-l-2 border-terminal-purple">
-            <RetroText className="text-terminal-purple">
-              Please <a href="/auth" className="underline">sign in</a> to submit your confession
-            </RetroText>
+          <div className="mt-2 p-4 bg-terminal-purple/10 border-l-4 border-terminal-purple rounded">
+            <p className="text-terminal-purple">
+              Please <a href="/auth" className="underline font-medium">sign in</a> to submit your confession
+            </p>
           </div>
         )}
       </form>
-    </PixelContainer>
+    </div>
   );
 };
 

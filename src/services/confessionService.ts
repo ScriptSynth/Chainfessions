@@ -129,13 +129,13 @@ export async function addConfession(
       mediaUrl = await uploadMedia(mediaFile, userId);
     }
     
-    // Insert confession
+    // Insert confession - FIX: Ensure degen_rating is provided (set to 1 if not specified)
     const { data, error } = await supabase
       .from('confessions')
       .insert({
         text: confession.text,
         chain: confession.chain,
-        degen_rating: confession.degenRating,
+        degen_rating: confession.degenRating || 1, // Set default value if not provided
         user_id: userId
       })
       .select()
